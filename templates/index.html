@@ -1,59 +1,53 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>YouTube Downloader</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>YouTube Video Downloader</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
-        $(function() {
-            $('form').submit(function(e) {
+        $(document).ready(function() {
+            $('#fetch-formats').click(function(e) {
                 e.preventDefault();
                 var url = $('#url').val();
                 $.ajax({
                     url: '/formats',
                     method: 'POST',
-                    data: {'url': url},
-                    success: function(data) {
-                        var select = $('#format');
-                        select.empty();
-                        $.each(data, function(index, value) {
-                            var option = $('<option></option>');
-                            option.attr('value', value.itag);
-                            option.text(value.resolution + ' (' + value.mime_type + ')');
-                            select.append(option);
-                        });
-                        select.prop('disabled', false);
-                        $('#download-btn').prop('disabled', true);
+                    data: {
+                        url: url
                     },
-                    error: function() {
-                        alert('Failed to fetch video formats.');
+                    success: function(data) {
+                        var formats = data.formats;
+                        $('#formats-list').empty();
+                        $.each(formats, function(i, format) {
+                            var option = $('<option>').attr('value', format.itag).text(format.resolution + ' (' + format.mime_type + ')');
+                            $('#formats-list').append(option);
+                        });
+                        $('#download').attr('disabled', false);
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(error);
                     }
                 });
             });
-
-            $('#format').change(function() {
-                if ($(this).val() !== '') {
-                    $('#download-btn').prop('disabled', false);
-                } else {
-                    $('#download-btn').prop('disabled', true);
-                }
+            $('#download').click(function(e) {
+                e.preventDefault();
+                var url = $('#url').val();
+                var format = $('#formats-list').val();
+                var downloadUrl = '/download?url=' + encodeURIComponent(url) + '&format=' + encodeURIComponent(format);
+                window.location.href = downloadUrl;
             });
         });
     </script>
 </head>
 <body>
-    <h1>YouTube Downloader</h1>
+    <h1>YouTube Video Downloader</h1>
     <form>
-        <label for="url">YouTube URL:</label>
-        <input type="text" id="url" required>
-        <button type="submit">Fetch formats</button>
-    </form>
-    <form action="/download" method="get">
-        <label for="format">Video format:</label>
-        <select id="format" name="format" disabled>
-            <option>Please paste a YouTube URL above and click "Fetch formats".</option>
-        </select>
-        <input type="hidden" id="url_hidden" name="url">
-        <button type="submit" id="download-btn" disabled>Download</button>
+        <label for="url">Video URL:</label>
+        <input type="text" id="url" name="url"><br>
+        <button id="fetch-formats">Fetch Formats</button>
+        <br>
+        <label for="formats-list">Select Format:</label>
+        <select id="formats-list" name="format"></select>
+        <button id="download" disabled>Download</button>
     </form>
 </body>
 </html>

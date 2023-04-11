@@ -8,18 +8,18 @@ def index():
     return render_template('index.html')
 
 @app.route('/formats', methods=['POST'])
-def formats():
+def get_formats():
     url = request.form['url']
-    yt = YouTube(url)
-    available_formats = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()
-    return jsonify([{'itag': s.itag, 'resolution': s.resolution, 'mime_type': s.mime_type} for s in available_formats])
+    video = YouTube(url)
+    formats = [{'itag': s.itag, 'resolution': s.resolution, 'mime_type': s.mime_type} for s in video.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()]
+    return jsonify(formats)
 
 @app.route('/download', methods=['GET'])
-def download():
+def download_video():
     url = request.args.get('url')
     itag = request.args.get('format')
-    yt = YouTube(url)
-    stream = yt.streams.get_by_itag(itag)
+    video = YouTube(url)
+    stream = video.streams.get_by_itag(itag)
     return stream.download()
 
 if __name__ == '__main__':
