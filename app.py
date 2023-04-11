@@ -4,8 +4,15 @@ import subprocess
 import io
 import urllib.parse
 from flask import Flask, render_template, request, redirect, url_for, send_file, Response
+from werkzeug.serving import WSGIRequestHandler
+
+class MyRequestHandler(WSGIRequestHandler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.timeout = 1000  # set the timeout to 1000 seconds
 
 app = Flask(__name__)
+app.request_handler_cls = MyRequestHandler
 
 @app.route('/')
 def index():
