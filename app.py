@@ -12,7 +12,7 @@ def index():
 def download():
     url = request.form['url']
     video = pytube.YouTube(url)
-    stream = video.streams.filter(progressive=True).first()
+    stream = video.streams.get_highest_resolution()
     filename = stream.default_filename
     stream.download()
     path = os.path.join(os.getcwd(), filename)
