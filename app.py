@@ -31,11 +31,8 @@ class Stream:
 
 @app.route('/download', methods=['GET', 'POST'])
 def download():
-    if request.method == 'POST':
-        video_url = request.form['url']
-    else:
-        video_url = request.args.get('url')
-    yt = YouTube(video_url)
+    video_url = request.form['url']
+    yt = pytube.YouTube(url)
     stream = yt.streams.get_highest_resolution()
     response = Response(stream.stream_to_buffer(), mimetype='video/mp4')
     response.headers['Content-Disposition'] = f'attachment; filename={yt.title}.mp4'
