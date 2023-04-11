@@ -1,14 +1,102 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>YouTube Downloader</title>
+    <title>YouTube Downloader</title>
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f4f4;
+            font-family: 'Roboto', sans-serif;
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        form {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: none;
+            background-color: #f8f8f8;
+            margin-bottom: 20px;
+        }
+        button[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4285f4;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        button[type="submit"]:hover {
+            background-color: #3367d6;
+        }
+        .spinner {
+            display: none;
+            margin: 0 auto;
+            width: 50px;
+            height: 50px;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+        }
+        .spinner::before {
+            content: "";
+            box-sizing: border-box;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            margin-top: -15px;
+            margin-left: -15px;
+            border-radius: 50%;
+            border: 3px solid #ccc;
+            border-top-color: #999;
+            animation: spinner 0.6s linear infinite;
+        }
+        @keyframes spinner {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-	<h1>Download YouTube Videos</h1>
-	<form action="{{ url_for('download') }}" method="post">
-		<label for="url">Video URL:</label>
-		<input type="text" name="url" id="url">
-		<button type="submit">Download</button>
-	</form>
+    <h1>Download YouTube Videos</h1>
+    <form id="download-form" action="{{ url_for('download') }}" method="post">
+        <label for="url">Paste the link to your YouTube video below:</label>
+        <input type="text" name="url" id="url" placeholder="https://www.youtube.com/watch?v=...">
+        <button type="submit">Download</button>
+        <div class="spinner" id="spinner"></div>
+    </form>
+    <script>
+        const form = document.getElementById("download-form");
+        const spinner = document.getElementById("spinner");
+
+        form.addEventListener("submit", function() {
+            spinner.style.display = "block";
+        });
+
+        window.addEventListener("load", function() {
+            spinner.style.display = "none";
+        });
+    </script>
 </body>
-</html>
+</html
