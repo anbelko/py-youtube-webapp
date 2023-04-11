@@ -16,12 +16,14 @@ def get_formats():
     return jsonify(formats)
 
 @app.route('/download', methods=['GET'])
-def download_video():
+def download():
     url = request.args.get('url')
     itag = request.args.get('format')
     yt = YouTube(url)
     stream = yt.streams.get_by_itag(itag)
-    response = stream.stream_to_buffer()
+    response = make_response(stream.stream_to_buffer())
+    response.headers['Content-Disposition'] = 'attachment; filename="{}.mp4"'.format(yt.title)
+    response.headers['Content-Type'] = stream.mime_type
     return response
 
 if __name__ == '__main__':
