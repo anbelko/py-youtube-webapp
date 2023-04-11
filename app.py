@@ -31,7 +31,7 @@ class Stream:
 
 @app.route('/download', methods=['GET', 'POST'])
 def download():
-    video_url = request.form['url']
+    url = request.form['url']
     yt = pytube.YouTube(url)
     stream = yt.streams.get_highest_resolution()
     response = Response(stream.stream_to_buffer(), mimetype='video/mp4')
