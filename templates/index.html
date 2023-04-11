@@ -1,53 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>YouTube Video Downloader</title>
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#fetch-formats').click(function(e) {
-                e.preventDefault();
-                var url = $('#url').val();
-                $.ajax({
-                    url: '/formats',
-                    method: 'POST',
-                    data: {
-                        url: url
-                    },
-                    success: function(data) {
-                        var formats = data.formats;
-                        $('#formats-list').empty();
-                        $.each(formats, function(i, format) {
-                            var option = $('<option>').attr('value', format.itag).text(format.resolution + ' (' + format.mime_type + ')');
-                            $('#formats-list').append(option);
-                        });
-                        $('#download').attr('disabled', false);
-                    },
-                    error: function(xhr, status, error) {
-                        console.log(error);
-                    }
-                });
-            });
-            $('#download').click(function(e) {
-                e.preventDefault();
-                var url = $('#url').val();
-                var format = $('#formats-list').val();
-                var downloadUrl = '/download?url=' + encodeURIComponent(url) + '&format=' + encodeURIComponent(format);
-                window.location.href = downloadUrl;
-            });
-        });
-    </script>
+  <meta charset="UTF-8">
+  <title>YouTube Video Downloader</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-    <h1>YouTube Video Downloader</h1>
-    <form>
-        <label for="url">Video URL:</label>
-        <input type="text" id="url" name="url"><br>
-        <button id="fetch-formats">Fetch Formats</button>
-        <br>
-        <label for="formats-list">Select Format:</label>
-        <select id="formats-list" name="format"></select>
-        <button id="download" disabled>Download</button>
-    </form>
+  <form id="url-form">
+    <label for="url">Video URL:</label>
+    <input type="text" id="url" name="url" placeholder="Enter YouTube video URL">
+    <button id="fetch-formats" type="button">Fetch Formats</button>
+  </form>
+  <div id="formats-list"></div>
+  <button id="download" type="button" disabled>Download</button>
+
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#fetch-formats').click(function() {
+        var url = $('#url').val();
+        $.ajax({
+          type: 'POST',
+          url: '/formats',
+          data: { url: url },
+          success: function(response) {
+            $('#formats-list').empty();
+            var formats = response.formats;
+            $.each(formats, function(i, format) {
+              $('#formats-list').append($('<option>', {
+                value: format.itag,
+                text: format.resolution + ' - ' + format.mime_type
+              }));
+            });
+            $('#download').prop('disabled', false);
+          },
+          error: function(error) {
+            console.log(error);
+          }
+        });
+      });
+
+      $('#download').click(function() {
+        var url = $('#url').val();
+        var format = $('#formats-list').val();
+        window.location.href = '/download?url=' + encodeURIComponent(url) + '&format=' + encodeURIComponent(format);
+      });
+    });
+  </script>
 </body>
 </html>
