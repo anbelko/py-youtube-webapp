@@ -1,53 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>YouTube Video Downloader</title>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<title>YouTube Downloader</title>
 </head>
 <body>
-    <h1>YouTube Video Downloader</h1>
-    <form id="url-form">
-        <label for="url">Enter YouTube Video URL:</label><br>
-        <input type="text" id="url" name="url" required><br>
-        <button type="button" id="fetch-btn">Fetch Formats</button>
-    </form>
-    <br>
-    <form id="download-form">
-        <label for="formats">Select Format:</label><br>
-        <select id="formats" name="formats">
-        </select><br><br>
-        <button type="submit" id="download-btn" disabled>Download</button>
-    </form>
-    <script>
-        $(document).ready(function() {
-            $('#fetch-btn').click(function() {
-                var url = $('#url').val();
-                $.ajax({
-                    type: 'POST',
-                    url: '/formats',
-                    data: $('#url-form').serialize(),
-                    success: function(response) {
-                        console.log(response);
-                        var formats = $('#formats');
-                        formats.empty();
-                        $.each(response, function(i, format) {
-                            formats.append($('<option>').attr('value', format.itag).text(format.resolution + ' - ' + format.mime_type));
-                        });
-                        $('#download-btn').prop('disabled', false);
-                    },
-                    error: function(error) {
-                        console.log(error);
-                    }
-                });
-            });
-
-            $('#download-form').submit(function() {
-                var url = $('#url').val();
-                var itag = $('#formats').val();
-                window.location.href = '/download?url=' + encodeURIComponent(url) + '&format=' + itag;
-                return false;
-            });
-        });
-    </script>
+	<h1>Download YouTube Videos</h1>
+	<form action="{{ url_for('download') }}" method="post">
+		<label for="url">Video URL:</label>
+		<input type="text" name="url" id="url">
+		<button type="submit">Download</button>
+	</form>
 </body>
 </html>
