@@ -29,10 +29,10 @@ class Stream:
                 yield buffer.getvalue()
                 buffer.truncate(0)
 
-@app.route('/download')
+@app.route('/download', methods=['GET'])
 def download():
     video_url = request.args.get('url')
-    yt = YouTube(video_url)
+    yt = YouTube(video_url) 
     stream = Stream(yt.streams.get_highest_resolution())
     buffer = io.BytesIO()
     for chunk in stream.stream_to_buffer(buffer):
