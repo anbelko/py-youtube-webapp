@@ -21,7 +21,7 @@ def get_formats():
     formats = [{'itag': s.itag, 'resolution': s.resolution, 'mime_type': s.mime_type} for s in available_formats]
     return jsonify(formats)
 
-@app.route("/download", methods=["POST"])
+@app.route('/download', methods=['GET', 'POST'])
 def download_video():
     url = request.form.get("url")
     format_id = request.form.get("format_id")
