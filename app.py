@@ -29,16 +29,17 @@ class Stream:
                 yield buffer.getvalue()
                 buffer.truncate(0)
 
-@app.route('/download', methods=['GET'])
+@app.route('/download', methods=['GET', 'POST'])
 def download():
-    video_url = request.args.get('url')
-    yt = YouTube(video_url) 
-    stream = Stream(yt.streams.get_highest_resolution())
-    buffer = io.BytesIO()
-    for chunk in stream.stream_to_buffer(buffer):
-        pass
-    buffer.seek(0)
-    return Response(buffer, mimetype='video/mp4')
+    if request.method == 'POST':
+        video_url = request.form['url']
+    else:
+        video_url = request.args.get('url')
+    yt = YouTube(video_url)
+    stream = yt.streams.get_highest_resolution()
+    response = Response(stream.stream_to_buffer(), mimetype='video/mp4')
+    response.headers['Content-Disposition'] = f'attachment; filename={yt.title}.mp4'
+    return response
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
