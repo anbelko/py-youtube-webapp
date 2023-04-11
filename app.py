@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify
 from pytube import YouTube
 
 app = Flask(__name__)
@@ -7,14 +7,20 @@ app = Flask(__name__)
 def index():
     return render_template('index.html')
 
-@app.route('/download', methods=['POST'])
-def download():
+@app.route('/formats', methods=['POST'])
+def formats():
     url = request.form['url']
     yt = YouTube(url)
-    itag = request.form['itag']
-    video = yt.streams.get_by_itag(itag)
-    download_url = video.url
-    return redirect(download_url)
+    available_formats = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc()
+    return jsonify([{'itag': s.itag, 'resolution': s.resolution, 'mime_type': s.mime_type} for s in available_formats])
+
+@app.route('/download', methods=['GET'])
+def download():
+    url = request.args.get('url')
+    itag = request.args.get('format')
+    yt = YouTube(url)
+    stream = yt.streams.get_by_itag(itag)
+    return stream.download()
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=8080)

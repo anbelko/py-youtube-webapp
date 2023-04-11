@@ -1,22 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>YouTube Video Downloader</title>
+    <title>YouTube Downloader</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(function() {
+            $('form').submit(function(e) {
+                e.preventDefault();
+                var url = $('#url').val();
+                $.ajax({
+                    url: '/formats',
+                    method: 'POST',
+                    data: {'url': url},
+                    success: function(data) {
+                        var select = $('#format');
+                        select.empty();
+                        $.each(data, function(index, value) {
+                            var option = $('<option></option>');
+                            option.attr('value', value.itag);
+                            option.text(value.resolution + ' (' + value.mime_type + ')');
+                            select.append(option);
+                        });
+                        select.prop('disabled', false);
+                    },
+                    error: function() {
+                        alert('Failed to fetch video formats.');
+                    }
+                });
+            });
+        });
+    </script>
 </head>
 <body>
-    <h1>YouTube Video Downloader</h1>
-    <form action="{{ url_for('download') }}" method="POST">
-        <label for="url">Video URL:</label>
-        <input type="text" id="url" name="url" required>
-        <br>
-        <label for="itag">Video Format:</label>
-        <select id="itag" name="itag" required>
-            {% for stream in streams %}
-            <option value="{{ stream.itag }}">{{ stream.resolution }} - {{ stream.mime_type }}</option>
-            {% endfor %}
+    <h1>YouTube Downloader</h1>
+    <form>
+        <label for="url">YouTube URL:</label>
+        <input type="text" id="url" required>
+        <button type="submit">Fetch formats</button>
+    </form>
+    <form action="/download" method="get">
+        <label for="format">Video format:</label>
+        <select id="format" name="format" disabled>
+            <option>Please paste a YouTube URL above and click "Fetch formats".</option>
         </select>
-        <br>
-        <button type="submit">Download</button>
+        <input type="hidden" id="url_hidden" name="url">
+        <button type="submit" disabled>Download</button>
     </form>
 </body>
 </html>
