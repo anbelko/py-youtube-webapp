@@ -22,11 +22,20 @@
                             select.append(option);
                         });
                         select.prop('disabled', false);
+                        $('#download-btn').prop('disabled', true);
                     },
                     error: function() {
                         alert('Failed to fetch video formats.');
                     }
                 });
+            });
+
+            $('#format').change(function() {
+                if ($(this).val() !== '') {
+                    $('#download-btn').prop('disabled', false);
+                } else {
+                    $('#download-btn').prop('disabled', true);
+                }
             });
         });
     </script>
@@ -44,7 +53,7 @@
             <option>Please paste a YouTube URL above and click "Fetch formats".</option>
         </select>
         <input type="hidden" id="url_hidden" name="url">
-        <button type="submit" disabled>Download</button>
+        <button type="submit" id="download-btn" disabled>Download</button>
     </form>
 </body>
 </html>
